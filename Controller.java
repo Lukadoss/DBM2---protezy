@@ -94,8 +94,6 @@ public class Controller {
 
     /**
      * Otevírá obrázek rentgenu a zpracovává ho pro zobrazení a následnou práci.
-     *
-     * @param actionEvent
      */
     public void openFile(ActionEvent actionEvent) {
         Stage stage = (Stage) mainStage.getScene().getWindow();

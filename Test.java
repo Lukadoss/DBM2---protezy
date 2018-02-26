@@ -9,7 +9,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Stage;
 public class Test extends Application {
 
-    double orgSceneX, orgSceneY;
+    private double orgSceneX, orgSceneY;
 
     private Circle createCircle(double x, double y, double r, Color color) {
         Circle circle = new Circle(x, y, r, color);

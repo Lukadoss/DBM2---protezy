@@ -6,8 +6,14 @@ import java.io.IOException;
 /**
  * Created by Lukado on 23. 11. 2016.
  */
+
 class ImageLoader {
-    BufferedImage readImage(String fileLocation) {
+    /**
+     * Načte obrázek od objektu
+     * @param fileLocation umístění
+     * @return obrázek
+     */
+    public BufferedImage readImage(String fileLocation) {
         BufferedImage img = null;
         try {
             img = ImageIO.read(new File(fileLocation));
@@ -17,7 +23,13 @@ class ImageLoader {
         return img;
     }
 
-    void writeImage(BufferedImage img, String fileLocation,
+    /**
+     * Zapíše obrázek na disk
+     * @param img obrázek
+     * @param fileLocation umístění
+     * @param extension přípona
+     */
+    public void writeImage(BufferedImage img, String fileLocation,
                     String extension) {
         try {
             File outfile = new File(fileLocation);
