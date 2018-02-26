@@ -1,22 +1,18 @@
 import javafx.scene.control.Label;
 import javafx.scene.shape.Line;
-
 import java.util.*;
 
 /**
  * Created by Lukado on 23. 11. 2016.
  */
 class Processor {
-    private String outputImageFilePath = "img/result.png";
     private double capSize=0;
 
-    Processor(Line line, double ratio, Label l) {
-//        ImageLoader il = new ImageLoader();
+    Processor(Line line, double imgRatio, double templateRatio, Label l) {
         HashMap<Double, String> caps = initAlofitSizes();
-        double capLength = getLineToCm(line, ratio);
+        double capLength = getLineToCm(line, imgRatio, templateRatio);
 
         double lower = Double.MAX_VALUE;
-
         for (Map.Entry<Double, String> entry : caps.entrySet()){
             double tmp = Math.abs(capLength-entry.getKey());
             if (tmp<lower) {
@@ -45,19 +41,21 @@ class Processor {
         return aloSizes;
     }
 
-    private double getLineToCm(Line line, double ratio){
+    private double getLineToCm(Line line, double imgRatio, double templateRatio){
         double lineLength = Math.sqrt(Math.pow(line.getEndX()-line.getStartX(), 2)
-                + Math.pow(line.getEndY()-line.getStartY(), 2))*ratio; // delka rezu
+                + Math.pow(line.getEndY()-line.getStartY(), 2))*imgRatio; // delka rezu
 
-        //prevedeno na cm, PPI = 127 = sqrt(1920^2+1080^2)/17.3 - 17.3 velikost mého ntb displeje (need FIX pro všechny), * magnification
-                double lineToMetrics = (lineLength * 2.54 / 127)*1.2;
+//        prevedeno na cm, PPI = 127 = sqrt(1920^2+1080^2)/17.3 - 17.3 velikost mého ntb displeje, pure CM na ntb
+//        double lineToMetrics = (lineLength * 2.54 / 127);
 //        double pixToCm = (1 / 25.4) * 96;
 
-//        double lineToAloSize = lineLength*0.0117;
+        double templateOneCm = 94*imgRatio/templateRatio;
+        //0.6 magická konstanta která převádí cm výsledky do podoby na alofit papírech
+        double fixedSize = lineLength/templateOneCm+0.6;
 
-        System.out.println("Velikost řezu: " +lineToMetrics+ " cm --- "+lineLength/38);
+        System.out.println("Velikost řezu: " +fixedSize);
 
-        return lineLength;
+        return fixedSize;
     }
 
     public double getCapSize(){

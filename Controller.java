@@ -14,6 +14,7 @@ import javafx.scene.shape.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
@@ -46,8 +47,17 @@ public class Controller {
         if (img != null && line.isVisible()) {
 //            Processor prcs = new Processor(filePath, Integer.parseInt(maxThreshold.getText()), Integer.parseInt(minThreshold.getText()),
 //                    Float.parseFloat(Sigma.getText()), Integer.parseInt(kernel.getText()), getExt());
+
+            BufferedImage templateImage;
+            if(imgHeight>imgWidth)
+                templateImage = new ImageLoader().readImage("templates/height.jpg");
+            else
+                templateImage = new ImageLoader().readImage("templates/width.jpg");
+
+            double templateRatio = templateImage.getWidth() / imgWidth;
             double imgResizeRatio = img.getWidth() / imgWidth;
-            Processor prcs = new Processor(line, imgResizeRatio, aluSize);
+
+            Processor prcs = new Processor(line, imgResizeRatio, templateRatio, aluSize);
             sep.setVisible(true);
             out.setVisible(true);
             aluSize.setVisible(true);
@@ -142,6 +152,7 @@ public class Controller {
 //            }
 //        });
 
+        path = new Path();
         line = new Line();
         line.setStrokeWidth(1);
         line.setStroke(Paint.valueOf("red"));
@@ -186,7 +197,10 @@ public class Controller {
 
             if (line != null && imgResize == 0)
                 setLinePoints(line.getStartX(), line.getStartY() - imgResize, line.getEndX(), line.getEndY() - imgResize);
-            else line.setVisible(false);
+            else {
+                line.setVisible(false);
+                pane.getChildren().remove(path);
+            }
         });
 
         pane.widthProperty().addListener(observable -> {
@@ -204,7 +218,10 @@ public class Controller {
 
             if (line != null && imgResize == 0)
                 setLinePoints(line.getStartX() - layoutMove, line.getStartY(), line.getEndX() - layoutMove, line.getEndY());
-            else line.setVisible(false);
+            else {
+                line.setVisible(false);
+                pane.getChildren().remove(path);
+            }
         });
 
     }
