@@ -41,6 +41,13 @@ class Processor {
         return aloSizes;
     }
 
+    /**
+     * Převod délky zakreslené přímky na centimetry
+     * @param line přímka
+     * @param imgRatio poměr obrázku
+     * @param templateRatio poměr šablony
+     * @return velikost přepočtené přímky
+     */
     private double getLineToCm(Line line, double imgRatio, double templateRatio){
         double lineLength = Math.sqrt(Math.pow(line.getEndX()-line.getStartX(), 2)
                 + Math.pow(line.getEndY()-line.getStartY(), 2))*imgRatio; // delka rezu

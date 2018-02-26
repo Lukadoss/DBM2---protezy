@@ -45,9 +45,6 @@ public class Controller {
      */
     public void solve() {
         if (img != null && line.isVisible()) {
-//            Processor prcs = new Processor(filePath, Integer.parseInt(maxThreshold.getText()), Integer.parseInt(minThreshold.getText()),
-//                    Float.parseFloat(Sigma.getText()), Integer.parseInt(kernel.getText()), getExt());
-
             BufferedImage templateImage;
             if(imgHeight>imgWidth)
                 templateImage = new ImageLoader().readImage("templates/height.jpg");
@@ -134,23 +131,6 @@ public class Controller {
     public void initialize() {
         imgPort.fitWidthProperty().bind(pane.widthProperty());
         imgPort.fitHeightProperty().bind(pane.heightProperty());
-        //        minThreshold.textProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!newValue.matches("\\d*")) {
-//                minThreshold.setText(newValue.replaceAll("[^\\d]", ""));
-//            }
-//        });
-//
-//        maxThreshold.textProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!newValue.matches("\\d*")) {
-//                maxThreshold.setText(newValue.replaceAll("[^\\d]", ""));
-//            }
-//        });
-//
-//        Sigma.textProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!newValue.matches("\\d.*")) {
-//                Sigma.setText(newValue.replaceAll("[^\\d]", ""));
-//            }
-//        });
 
         path = new Path();
         line = new Line();
@@ -160,70 +140,9 @@ public class Controller {
         line.setVisible(false);
         pane.getChildren().add(line);
 
-        pane.setOnMousePressed(t -> {
-            setLinePoints(t.getX(), t.getY(), t.getX(), t.getY());
-            pane.getChildren().remove(path);
-        });
-
-        pane.setOnMouseDragged(t -> {
-            if (img != null) {
-                isDragged = true;
-                line.setVisible(true);
-                setLineEndPoints(t.getX(), t.getY());
-                pane.setCursor(Cursor.NONE);
-            }
-        });
-
-        pane.setOnMouseReleased(t -> {
-            if (!isDragged) {
-                line.setVisible(false);
-                sep.setVisible(false);
-                out.setVisible(false);
-                aluSize.setVisible(false);
-            }
-            else solve();
-
-            isDragged = false;
-            pane.setCursor(Cursor.CROSSHAIR);
-        });
-
-        pane.heightProperty().addListener(observable -> {
-            double tmp2 = imgHeight;
-            imgWidth = Math.min(imgPort.getFitWidth(), imgPort.getFitHeight() * aspectRatio);
-            imgHeight = Math.min(imgPort.getFitHeight(), imgPort.getFitWidth() / aspectRatio);
-            if (img != null) imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
-
-            double imgResize = tmp2 - imgHeight;
-
-            if (line != null && imgResize == 0)
-                setLinePoints(line.getStartX(), line.getStartY() - imgResize, line.getEndX(), line.getEndY() - imgResize);
-            else {
-                line.setVisible(false);
-                pane.getChildren().remove(path);
-            }
-        });
-
-        pane.widthProperty().addListener(observable -> {
-            double tmp1 = imgPort.getX();
-            double tmp2 = imgWidth;
-
-            imgHeight = Math.min(imgPort.getFitHeight(), imgPort.getFitWidth() / aspectRatio);
-            imgWidth = Math.min(imgPort.getFitWidth(), imgPort.getFitHeight() * aspectRatio);
-            if (img != null) {
-                imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
-            }
-
-            double layoutMove = tmp1 - imgPort.getX();
-            double imgResize = tmp2 - imgWidth;
-
-            if (line != null && imgResize == 0)
-                setLinePoints(line.getStartX() - layoutMove, line.getStartY(), line.getEndX() - layoutMove, line.getEndY());
-            else {
-                line.setVisible(false);
-                pane.getChildren().remove(path);
-            }
-        });
-
+//        cannyEdgeEvents();
+        mouseEvents();
+        resizeEvents();
     }
 
     /**
@@ -264,5 +183,94 @@ public class Controller {
             extension = filePath.substring(i + 1);
         }
         return extension;
+    }
+
+    private void mouseEvents() {
+        pane.setOnMousePressed(t -> {
+            setLinePoints(t.getX(), t.getY(), t.getX(), t.getY());
+            pane.getChildren().remove(path);
+        });
+
+        pane.setOnMouseDragged(t -> {
+            if (img != null) {
+                isDragged = true;
+                line.setVisible(true);
+                setLineEndPoints(t.getX(), t.getY());
+                pane.setCursor(Cursor.NONE);
+            }
+        });
+
+        pane.setOnMouseReleased(t -> {
+            if (!isDragged) {
+                line.setVisible(false);
+                sep.setVisible(false);
+                out.setVisible(false);
+                aluSize.setVisible(false);
+            }
+            else solve();
+
+            isDragged = false;
+            pane.setCursor(Cursor.CROSSHAIR);
+        });
+    }
+
+    //TODO: *ratio, bude pohodka, přijdu na to
+    private void resizeEvents() {
+        pane.heightProperty().addListener(observable -> {
+            double tmp2 = imgHeight;
+            imgWidth = Math.min(imgPort.getFitWidth(), imgPort.getFitHeight() * aspectRatio);
+            imgHeight = Math.min(imgPort.getFitHeight(), imgPort.getFitWidth() / aspectRatio);
+            if (img != null) imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
+
+            double imgResize = tmp2 - imgHeight;
+
+            if (line != null && imgResize == 0)
+                setLinePoints(line.getStartX(), line.getStartY() - imgResize, line.getEndX(), line.getEndY() - imgResize);
+            else {
+                line.setVisible(false);
+                pane.getChildren().remove(path);
+            }
+        });
+
+        pane.widthProperty().addListener(observable -> {
+            double tmp1 = imgPort.getX();
+            double tmp2 = imgWidth;
+
+            imgHeight = Math.min(imgPort.getFitHeight(), imgPort.getFitWidth() / aspectRatio);
+            imgWidth = Math.min(imgPort.getFitWidth(), imgPort.getFitHeight() * aspectRatio);
+            if (img != null) {
+                imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
+            }
+
+            double layoutMove = tmp1 - imgPort.getX();
+            double imgResize = tmp2 - imgWidth;
+
+            if (line != null && imgResize == 0)
+                setLinePoints(line.getStartX() - layoutMove, line.getStartY(), line.getEndX() - layoutMove, line.getEndY());
+            else {
+                line.setVisible(false);
+                pane.getChildren().remove(path);
+            }
+        });
+    }
+
+    private void cannyEdgeEvents() {
+        minThreshold.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                minThreshold.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        maxThreshold.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                maxThreshold.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        Sigma.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d.*")) {
+                Sigma.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
     }
 }
