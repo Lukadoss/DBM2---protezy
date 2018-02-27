@@ -38,7 +38,7 @@ public class Controller {
     private boolean isDragged = false;
 
     private Path path;
-    Processor prcs;
+    private Processor prcs;
 
     /**
      * Volá třídu na výpočet protézy na daném obrázku rentgenu
@@ -232,12 +232,13 @@ public class Controller {
             if (img != null) imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
             pane.getChildren().remove(path);
 
-            double widthRatio = imgWidth / tmp2;
-            double heightRatio = imgHeight / tmp3;
+            double widthRatio = imgWidth/tmp2;
+            double heightRatio = imgHeight/tmp3;
             double layoutMove = tmp1 - imgPort.getX();
 
             if (line.isVisible()) {
-                setLinePoints((line.getStartX() - layoutMove)*widthRatio , line.getStartY() * heightRatio, (line.getEndX() - layoutMove)*widthRatio , line.getEndY() * heightRatio);
+                if(imgWidth>imgHeight) setLinePoints((line.getStartX() - layoutMove) , line.getStartY() * heightRatio, (line.getEndX()+layoutMove) , line.getEndY() * heightRatio);
+                else setLinePoints((line.getStartX() - layoutMove/2) , line.getStartY() * heightRatio, (line.getEndX()+layoutMove/2) , line.getEndY() * heightRatio);
                 drawCap(prcs);
             } else {
                 line.setVisible(false);

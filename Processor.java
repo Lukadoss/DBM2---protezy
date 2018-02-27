@@ -30,6 +30,10 @@ class Processor {
         l.setText(caps.get(capSize));
     }
 
+    /**
+     * Inicializace výstupních velikostí protéz do mapy
+     * @return
+     */
     private HashMap<Double, String> initAlofitSizes(){
         HashMap<Double, String> aloSizes = new HashMap<Double, String>(){};
         aloSizes.put(4.6,"46/FF");
@@ -64,12 +68,8 @@ class Processor {
 //        double pixToCm = (1 / 25.4) * 96;
 
         double templateOneCm = 94*imgRatio/templateRatio;
-        //0.6 magická konstanta která převádí cm výsledky do podoby na alofit papírech
-        double fixedSize = lineLength/templateOneCm+0.2;
-
-        System.out.println("Velikost řezu: " +fixedSize+" ratio: "+imgRatio);
-
-        return fixedSize;
+        //0.2 magická konstanta která převádí cm výsledky do podoby na alofit papírech
+        return lineLength/templateOneCm+0.2;
     }
 
     public double getCapSize(){
