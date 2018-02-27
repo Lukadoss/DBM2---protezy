@@ -38,33 +38,40 @@ public class Controller {
     private boolean isDragged = false;
 
     private Path path;
+    Processor prcs;
 
     /**
-     * Volá třídu na výpočet protézy
-     *
+     * Volá třídu na výpočet protézy na daném obrázku rentgenu
      */
     public void solve() {
         if (img != null && line.isVisible()) {
             BufferedImage templateImage;
-            if(imgHeight>imgWidth)
+            if (imgHeight > imgWidth)
                 templateImage = new ImageLoader().readImage("templates/height.jpg");
             else
                 templateImage = new ImageLoader().readImage("templates/width.jpg");
 
-            double templateRatio = templateImage.getWidth() / imgWidth;
+            double templateAspectRatio = (double) templateImage.getWidth() / templateImage.getHeight();
+            System.out.println(templateAspectRatio);
+            double templateRatio = templateImage.getWidth() / Math.min(imgPort.getFitWidth(), imgPort.getFitHeight() * templateAspectRatio);
             double imgResizeRatio = img.getWidth() / imgWidth;
 
-            Processor prcs = new Processor(line, imgResizeRatio, templateRatio, aluSize);
+            prcs = new Processor(line, imgResizeRatio, templateRatio, aluSize);
             sep.setVisible(true);
             out.setVisible(true);
             aluSize.setVisible(true);
 
             drawCap(prcs);
-        }else{
+        } else {
             aluSize.setText("Image doesn't exist");
         }
     }
 
+    /**
+     * Vykreslení kloubu protézy
+     *
+     * @param p třída výpočtu kreslení přímky
+     */
     private void drawCap(Processor p) {
         path = new Path();
         ArcTo arcTo = new ArcTo();
@@ -73,12 +80,12 @@ public class Controller {
         arcTo.setRadiusX(p.getCapSize());
         arcTo.setRadiusY(p.getCapSize());
 
-        if(line.getStartX()>line.getEndX()){
+        if (line.getStartX() > line.getEndX()) {
             moveTo.setX(line.getStartX());
             moveTo.setY(line.getStartY());
             arcTo.setX(line.getEndX());
             arcTo.setY(line.getEndY());
-        }else{
+        } else {
             arcTo.setX(line.getStartX());
             arcTo.setY(line.getStartY());
             moveTo.setX(line.getEndX());
@@ -118,6 +125,9 @@ public class Controller {
             imgHeight = Math.min(imgPort.getFitHeight(), imgPort.getFitWidth() / aspectRatio);
             imgWidth = Math.min(imgPort.getFitWidth(), imgPort.getFitHeight() * aspectRatio);
             imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
+
+            line.setVisible(false);
+            pane.getChildren().remove(path);
         }
 
     }
@@ -204,50 +214,55 @@ public class Controller {
                 sep.setVisible(false);
                 out.setVisible(false);
                 aluSize.setVisible(false);
-            }
-            else solve();
+            } else solve();
 
             isDragged = false;
             pane.setCursor(Cursor.CROSSHAIR);
         });
     }
 
-    //TODO: *ratio, bude pohodka, přijdu na to
     private void resizeEvents() {
         pane.heightProperty().addListener(observable -> {
-            double tmp2 = imgHeight;
+            double tmp1 = imgPort.getX();
+            double tmp2 = imgWidth;
+            double tmp3 = imgHeight;
+
             imgWidth = Math.min(imgPort.getFitWidth(), imgPort.getFitHeight() * aspectRatio);
             imgHeight = Math.min(imgPort.getFitHeight(), imgPort.getFitWidth() / aspectRatio);
             if (img != null) imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
+            pane.getChildren().remove(path);
 
-            double imgResize = tmp2 - imgHeight;
+            double widthRatio = imgWidth / tmp2;
+            double heightRatio = imgHeight / tmp3;
+            double layoutMove = tmp1 - imgPort.getX();
 
-            if (line != null && imgResize == 0)
-                setLinePoints(line.getStartX(), line.getStartY() - imgResize, line.getEndX(), line.getEndY() - imgResize);
-            else {
+            if (line.isVisible()) {
+                setLinePoints((line.getStartX() - layoutMove)*widthRatio , line.getStartY() * heightRatio, (line.getEndX() - layoutMove)*widthRatio , line.getEndY() * heightRatio);
+                drawCap(prcs);
+            } else {
                 line.setVisible(false);
-                pane.getChildren().remove(path);
             }
         });
 
         pane.widthProperty().addListener(observable -> {
             double tmp1 = imgPort.getX();
             double tmp2 = imgWidth;
+            double tmp3 = imgHeight;
 
-            imgHeight = Math.min(imgPort.getFitHeight(), imgPort.getFitWidth() / aspectRatio);
             imgWidth = Math.min(imgPort.getFitWidth(), imgPort.getFitHeight() * aspectRatio);
-            if (img != null) {
-                imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
-            }
+            imgHeight = Math.min(imgPort.getFitHeight(), imgPort.getFitWidth() / aspectRatio);
+            if (img != null) imgPort.setX(pane.getWidth() / 2 - imgWidth / 2);
+            pane.getChildren().remove(path);
 
+            double widthRatio = imgWidth / tmp2;
+            double heightRatio = imgHeight / tmp3;
             double layoutMove = tmp1 - imgPort.getX();
-            double imgResize = tmp2 - imgWidth;
 
-            if (line != null && imgResize == 0)
-                setLinePoints(line.getStartX() - layoutMove, line.getStartY(), line.getEndX() - layoutMove, line.getEndY());
-            else {
+            if (line.isVisible()) {
+                setLinePoints((line.getStartX() - layoutMove) * widthRatio, line.getStartY() * heightRatio, (line.getEndX() - layoutMove) * widthRatio, line.getEndY() * heightRatio);
+                drawCap(prcs);
+            } else {
                 line.setVisible(false);
-                pane.getChildren().remove(path);
             }
         });
     }

@@ -3,11 +3,18 @@ import javafx.scene.shape.Line;
 import java.util.*;
 
 /**
- * Created by Lukado on 23. 11. 2016.
+ * Created by Lukado on 23. 11. 2017.
  */
 class Processor {
     private double capSize=0;
 
+    /**
+     * Konstruktor pro výpočet výběru velikosti kloubu protézy. Výsledek vypisuje do GUI.
+     * @param line přímka
+     * @param imgRatio ratio obrázku
+     * @param templateRatio ratio šablony
+     * @param l výstupní label
+     */
     Processor(Line line, double imgRatio, double templateRatio, Label l) {
         HashMap<Double, String> caps = initAlofitSizes();
         double capLength = getLineToCm(line, imgRatio, templateRatio);
@@ -58,9 +65,9 @@ class Processor {
 
         double templateOneCm = 94*imgRatio/templateRatio;
         //0.6 magická konstanta která převádí cm výsledky do podoby na alofit papírech
-        double fixedSize = lineLength/templateOneCm+0.6;
+        double fixedSize = lineLength/templateOneCm+0.2;
 
-        System.out.println("Velikost řezu: " +fixedSize);
+        System.out.println("Velikost řezu: " +fixedSize+" ratio: "+imgRatio);
 
         return fixedSize;
     }
