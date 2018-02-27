@@ -107,8 +107,7 @@ public class Controller {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Picture loader");
         fileChooser.setInitialDirectory(
-                new File("E:/Skola/Ctvrtak/DBM2/Semestralka_orez_kosti/Data_semestralni prace")
-//                new File(System.getProperty("user.dir"))
+                new File(System.getProperty("user.dir"))
         );
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image files", "*.jpg", "*.png", "*.jpeg"),
